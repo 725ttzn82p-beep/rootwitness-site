@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs — The Notary</title>
+<meta name="description" content="Quickstart for The Notary: install notary-client, append records to a Merkle transparency log, verify receipts offline, and run your own witness with notary-witness init and watch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334d0a8' stroke-width='1.6'%3E%3Cpath d='M12 2.6l7 3.4v5.4c0 4.3-2.9 8-7 10.1-4.1-2.1-7-5.8-7-10.1V6z'/%3E%3Cpath d='M12 9.2v5.6M9.2 12h5.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="./index.html" aria-label="The Notary — home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+        <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+      </svg>
+      <span>The&nbsp;Notary</span>
+      <span class="sub">docs</span>
+    </a>
+    <nav class="nav-links">
+      <a href="./index.html#how" class="hide-sm">How it works</a>
+      <a href="./index.html#witness" class="hide-sm">Witness</a>
+      <a href="./index.html#pricing">Pricing</a>
+      <a href="./docs.html" class="active">Docs</a>
+      <button class="icon-btn" id="theme" aria-label="Toggle color theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 019.4 3.5a8.6 8.6 0 1011.1 11.1z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="docs-layout">
+
+  <aside class="toc">
+    <p class="toc-h">Contents</p>
+    <a href="#quickstart">Quickstart</a>
+    <a href="#install">1 · Install</a>
+    <a href="#append">2 · Append a record</a>
+    <a href="#verify">3 · Verify offline</a>
+    <a href="#witness">4 · Run your witness</a>
+    <a href="#hashonly">Hash-only privacy mode</a>
+    <a href="#checkpoint">Checkpoint format</a>
+    <a href="#api">HTTP API</a>
+    <a href="#cli">CLI reference</a>
+    <a href="#ci">Alerting and CI</a>
+    <a href="#limits">What this cannot do</a>
+  </aside>
+
+  <article class="doc">
+    <p class="eyebrow" style="margin-bottom:var(--space-4)">Documentation</p>
+    <h1 id="quickstart">Quickstart</h1>
+    <p>
+      Five minutes end to end: append a record to a tamper-evident Merkle transparency log, verify the
+      receipt with your network disconnected, and start a witness that checks every future checkpoint we
+      publish. Everything below works on the free tier.
+    </p>
+    <p>
+      You will need an API key from the dashboard and a log name. Examples use the log
+      <code>acme-agents-prod</code>.
+    </p>
+
+    <h2 id="install">1 · Install</h2>
+    <p>The Python client ships both the library and the <code>notary-witness</code> command.</p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
+<pre><code>pip install notary-client</code></pre>
+    </div>
+    <p>Set your credentials in the environment so keys never land in source control.</p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
+<pre><code>export NOTARY_BASE_URL="https://api.notary.dev"
+export NOTARY_API_KEY="nk_live_8f3c…"</code></pre>
+    </div>
+
+    <h2 id="append">2 · Append a record</h2>
+    <p>
+      One call. The client canonicalizes the payload (RFC 8785 JSON Canonicalization), hashes the leaf, and
+      returns a receipt containing the leaf hash, the index, the tree size it was integrated at, and the
+      audit path needed for offline verification.
+    </p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">append.py</span><button class="copy" type="button">copy</button></div>
+<pre><code><span class="kw">import</span> os
+<span class="kw">from</span> notary_client <span class="kw">import</span> NotaryClient
+
+client = NotaryClient(
+    base_url=os.environ[<span class="s">"NOTARY_BASE_URL"</span>],
+    api_key=os.environ[<span class="s">"NOTARY_API_KEY"</span>],
+    log=<span class="s">"acme-agents-prod"</span>,
+)
+
+receipt = client.append({
+    <span class="s">"actor"</span>:      <span class="s">"agent:refunds-v3"</span>,
+    <span class="s">"action"</span>:     <span class="s">"issue_refund"</span>,
+    <span class="s">"subject"</span>:    <span class="s">"order_88213"</span>,
+    <span class="s">"amount_cents"</span>: <span class="n">4200</span>,
+    <span class="s">"currency"</span>:   <span class="s">"USD"</span>,
+    <span class="s">"approved_by"</span>: <span class="s">"policy:auto_under_5000"</span>,
+    <span class="s">"occurred_at"</span>: <span class="s">"2026-08-11T14:22:09Z"</span>,
+})
+
+<span class="kw">print</span>(receipt.leaf_hash)   <span class="c"># 4d7f257e9da7f32989ead03cef9fbbb0…</span>
+<span class="kw">print</span>(receipt.index)       <span class="c"># 2481929</span>
+<span class="kw">print</span>(receipt.tree_size)   <span class="c"># 2481930</span>
+
+<span class="c"># Store the receipt next to your own record. It is the</span>
+<span class="c"># artifact an auditor verifies — keep it, not just the entry.</span>
+receipt.save(<span class="s">"receipts/order_88213.notary.json"</span>)</code></pre>
+    </div>
+    <div class="callout">
+      <p class="ct">Note</p>
+      <p>
+        <code>append()</code> is safe to retry: pass <code>idempotency_key=</code> and a duplicate submission
+        returns the original receipt instead of writing a second leaf.
+      </p>
+    </div>
+
+    <h2 id="verify">3 · Verify the receipt offline</h2>
+    <p>
+      Verification is pure local computation. Hash the record, walk the audit path, compare the recomputed
+      root against a checkpoint you already hold. No API call, no network, no trust in us.
+    </p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">verify.py</span><button class="copy" type="button">copy</button></div>
+<pre><code><span class="kw">from</span> notary_client <span class="kw">import</span> Receipt, Checkpoint, verify_inclusion
+
+receipt    = Receipt.load(<span class="s">"receipts/order_88213.notary.json"</span>)
+checkpoint = Checkpoint.load(<span class="s">"checkpoints/2481930.note"</span>)
+
+result = verify_inclusion(
+    record=<span class="kw">open</span>(<span class="s">"records/order_88213.json"</span>, <span class="s">"rb"</span>).read(),
+    receipt=receipt,
+    checkpoint=checkpoint,
+    <span class="c"># Ed25519 public key printed by `notary-witness init`.</span>
+    <span class="c"># Pin it once; it is what makes the check independent.</span>
+    log_public_key=<span class="s">"notary.dev/acme+3f9c21ab+ASdW7pQ0…"</span>,
+)
+
+<span class="kw">assert</span> result.ok
+<span class="kw">print</span>(result.summary)
+<span class="c"># root 620d18e1…a3286f58 recomputed from leaf 2481929</span>
+<span class="c"># of 2481930 — matches signed checkpoint. verified offline.</span></code></pre>
+    </div>
+    <p>The same check from the shell, for auditors who prefer an air-gapped machine:</p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
+<pre><code>notary verify \
+  --record     records/order_88213.json \
+  --receipt    receipts/order_88213.notary.json \
+  --checkpoint checkpoints/2481930.note \
+  --log-key    notary.dev/acme+3f9c21ab+ASdW7pQ0… \
+  --offline
+
+<span class="c"># inclusion proof OK   index 2481929 / size 2481930</span>
+<span class="c"># note signature  OK   notary.dev/acme</span>
+<span class="c"># exit 0</span></code></pre>
+    </div>
+
+    <h2 id="witness">4 · Run your own witness</h2>
+    <p>
+      This is the part that matters. <code>notary-witness init</code> generates an Ed25519 keypair on your
+      machine and never transmits the private half. <code>notary-witness watch</code> then polls our
+      checkpoints, demands a consistency proof against the last checkpoint it accepted, verifies that proof
+      locally, and co-signs only if it holds.
+    </p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
+<pre><code>notary-witness init \
+  --log acme-agents-prod \
+  --state ./witness-state \
+  --key-file ./witness-state/witness.key   <span class="c"># or --kms aws:alias/notary-witness</span>
+
+<span class="c"># witness key   ed25519:local/acme+8b92e  (private key stays here)</span>
+<span class="c"># log key       notary.dev/acme+3f9c21ab+ASdW7pQ0…  (pinned)</span>
+<span class="c"># baseline      size 2481904  root 74f4e8ea…eb79332f</span></code></pre>
+    </div>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
+<pre><code>notary-witness watch \
+  --log acme-agents-prod \
+  --state ./witness-state \
+  --interval 5m \
+  --evidence-dir ./evidence
+
+<span class="c">[10:42:01] checkpoint 2481930  consistency 2481904 → 2481930  OK  co-signed</span>
+<span class="c">[10:47:01] checkpoint 2481958  consistency 2481930 → 2481958  OK  co-signed</span>
+<span class="c">[10:57:14] checkpoint 2482006  consistency FAILED</span>
+<span class="c">           old root not derivable — REFUSING TO CO-SIGN</span>
+<span class="c">           evidence/2026-08-11T10-57-14Z.split.json  (exit 3)</span></code></pre>
+    </div>
+    <div class="callout warn">
+      <p class="ct">Operational requirement</p>
+      <p>
+        A witness that isn't running proves nothing. Run <code>watch</code> as a supervised service, alert on
+        non-zero exit, and keep <code>--state</code> on durable storage — it holds the history the proof is
+        checked against.
+      </p>
+    </div>
+
+    <h2 id="hashonly">Hash-only privacy mode</h2>
+    <p>
+      On Team and Regulated, the client hashes locally and sends only the digest. We never receive the record
+      body. Proofs, checkpoints, and witness co-signing are unchanged, because the log only ever needed the hash.
+    </p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">hash_only.py</span><button class="copy" type="button">copy</button></div>
+<pre><code>client = NotaryClient(
+    base_url=os.environ[<span class="s">"NOTARY_BASE_URL"</span>],
+    api_key=os.environ[<span class="s">"NOTARY_API_KEY"</span>],
+    log=<span class="s">"acme-phi-audit"</span>,
+    hash_only=<span class="kw">True</span>,               <span class="c"># only sha256(canonical_json) leaves the process</span>
+    metadata_fields=[<span class="s">"action"</span>],   <span class="c"># optional non-sensitive fields kept in the clear</span>
+)
+
+receipt = client.append({
+    <span class="s">"actor"</span>: <span class="s">"agent:intake-v2"</span>,
+    <span class="s">"action"</span>: <span class="s">"read_chart"</span>,
+    <span class="s">"patient_ref"</span>: <span class="s">"mrn:88213"</span>,   <span class="c"># hashed locally, never sent</span>
+    <span class="s">"occurred_at"</span>: <span class="s">"2026-08-11T14:22:09Z"</span>,
+})</code></pre>
+    </div>
+
+    <h2 id="checkpoint">Checkpoint format</h2>
+    <p>
+      Checkpoints are C2SP signed notes: an origin line, the tree size, the base64 root hash, a blank line,
+      then one or more signature lines. Plain text on purpose — a human can read it, and a 30-line script can
+      verify it.
+    </p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">checkpoints/2481930.note</span><button class="copy" type="button">copy</button></div>
+<pre><code>notary.dev/acme-agents-prod
+2481930
+Yg0Y4VoCent6/O4Hn+5ys59tevQFTqyVC9PISjKGb1g=
+
+— notary.dev/acme P8lRqxCg5io2NorYJFiN3E9dOgpepDeZ6y2ZoQEk1cyx/0Cw96hEk8fteZYtNX8sQqQzX6TnezD6Sn86rl2oshPwqrw=
+— witness local/acme LtQkWT5yRMMMgz5dk0QTfQEU75aDvxyC34MnuLTGZm0J5OzgQ/4cJa/ytT5aBKNvqRKOuny/ynZM2FiwNLVGd9YA=</code></pre>
+    </div>
+    <p>
+      The second signature line is yours. Its presence is your own past statement that the history was
+      consistent at that size — which is why a later contradiction is provable without our cooperation.
+    </p>
+
+    <h2 id="api">HTTP API</h2>
+    <p>Every client operation is a plain HTTP call if you'd rather not use the library.</p>
+    <div class="tablewrap">
+      <table class="api">
+        <thead><tr><th>Endpoint</th><th>Method</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td>/v1/logs/{log}/entries</td><td>POST</td><td>Appends a record (or a digest in hash-only mode); returns a receipt with leaf hash, index, tree size, and audit path.</td></tr>
+          <tr><td>/v1/logs/{log}/checkpoint</td><td>GET</td><td>The latest C2SP signed note for the log.</td></tr>
+          <tr><td>/v1/logs/{log}/proof/inclusion</td><td>GET</td><td>Audit path for a leaf index against a given tree size.</td></tr>
+          <tr><td>/v1/logs/{log}/proof/consistency</td><td>GET</td><td>Proof that tree size <em>m</em> is a prefix of tree size <em>n</em>. This is what the witness demands.</td></tr>
+          <tr><td>/v1/logs/{log}/witnesses</td><td>POST</td><td>Submits a witness co-signature for a checkpoint.</td></tr>
+          <tr><td>/v1/logs/{log}/anchors</td><td>GET</td><td>OpenTimestamps attestations for archived checkpoints (Regulated).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="cli">CLI reference</h2>
+    <div class="tablewrap">
+      <table class="api">
+        <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>notary-witness init</td><td>Generate the witness keypair, pin the log's public key, record a baseline checkpoint.</td></tr>
+          <tr><td>notary-witness watch</td><td>Poll, verify consistency, co-sign or refuse. Exit 3 on refusal, exit 4 on unreachable log.</td></tr>
+          <tr><td>notary-witness show</td><td>Print current witness state: last accepted size, root, and co-signature history.</td></tr>
+          <tr><td>notary verify</td><td>Offline inclusion-proof verification for a record, receipt, and checkpoint.</td></tr>
+          <tr><td>notary export</td><td>Bundle records, receipts, checkpoints, and co-signatures into an auditor-ready archive.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="ci">Alerting and CI</h2>
+    <p>Treat a refusal like a production incident, because it is one.</p>
+    <div class="codeblock">
+      <div class="cb-bar"><span class="cb-name">witness.service</span><button class="copy" type="button">copy</button></div>
+<pre><code>[Unit]
+Description=Notary witness (acme-agents-prod)
+
+[Service]
+ExecStart=/usr/local/bin/notary-witness watch \
+  --log acme-agents-prod --state /var/lib/notary --interval 5m \
+  --evidence-dir /var/lib/notary/evidence
+Restart=always
+RestartPreventExitStatus=3        <span class="c"># exit 3 = consistency failure: stop and page a human</span>
+User=notary
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+    </div>
+
+    <h2 id="limits">What this cannot do</h2>
+    <p>
+      A transparency log proves that everything <em>in</em> the log is intact. It cannot prove that everything
+      that happened was written to it — omission at the boundary. If an agent acts and never calls
+      <code>append()</code>, no proof downstream can surface a record that was never created.
+    </p>
+    <p>
+      Mitigate it where you can — append from inside the tool-execution path rather than a side channel, log
+      the intent before the effect, and record heartbeat entries so a silent gap is visible as a gap. But
+      understand the limit precisely: we make alterations to recorded history detectable by third parties. We
+      make no claim to prevent alteration, we do not validate that a record is accurate, and we are not a substitute for
+      a records-retention program.
+    </p>
+    <p>
+      The full limitations discussion lives on the
+      <a href="./index.html#limits" style="color:var(--accent)">landing page</a>.
+    </p>
+  </article>
+
+</div>
+</main>
+
+<footer class="site">
+  <div class="wrap foot">
+    <div class="col">
+      <a class="brand" href="./index.html" aria-label="The Notary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+          <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+        </svg>
+        <span>The Notary</span>
+      </a>
+      <span class="hash">checkpoint notary.dev/acme · 2481930 · 620d18e1…a3286f58</span>
+    </div>
+    <div class="col">
+      <a href="./index.html#how">How it works</a>
+      <a href="./index.html#witness">Witness model</a>
+      <a href="./index.html#pricing">Pricing</a>
+    </div>
+    <div class="col">
+      <a href="#quickstart">Quickstart</a>
+      <a href="#api">HTTP API</a>
+      <a href="#limits">What this cannot do</a>
+    </div>
+    <div class="col" style="max-width:38ch">
+      <p class="legal">
+        The Notary provides tamper-evident, independently verifiable logging. It detects and evidences
+        alteration of recorded history; it does not prevent alteration, guarantee completeness of what
+        was submitted, or by itself satisfy any regulatory obligation. Nothing here is legal advice.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>

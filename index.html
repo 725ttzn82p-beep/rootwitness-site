@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Notary — tamper-evident audit log for AI agent activity</title>
+<meta name="description" content="An RFC 6962 Merkle transparency log for AI agent activity, with C2SP signed-note checkpoints and inclusion proofs you can verify offline. Run your own witness: don't trust us — check us.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334d0a8' stroke-width='1.6'%3E%3Cpath d='M12 2.6l7 3.4v5.4c0 4.3-2.9 8-7 10.1-4.1-2.1-7-5.8-7-10.1V6z'/%3E%3Cpath d='M12 9.2v5.6M9.2 12h5.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="./index.html" aria-label="The Notary — home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+        <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+      </svg>
+      <span>The&nbsp;Notary</span>
+      <span class="sub">transparency log</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how" class="hide-sm">How it works</a>
+      <a href="#witness" class="hide-sm">Witness</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#limits" class="hide-sm">Limits</a>
+      <a href="./docs.html">Docs</a>
+      <button class="icon-btn" id="theme" aria-label="Toggle color theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 019.4 3.5a8.6 8.6 0 1011.1 11.1z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" style="padding-block:0">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="tagbar">
+          <span class="tag live"><i class="dot"></i>log: acme-agents-prod</span>
+          <span class="tag">RFC 6962 Merkle log</span>
+          <span class="tag">C2SP signed notes</span>
+        </div>
+        <h1 class="hero-h"><span class="strike">Trust our storage.</span><br><em>Don't trust us — run this.</em></h1>
+        <p class="lede">
+          The Notary is a tamper-evident audit log for AI agent activity. Your agents append
+          records — tool calls, trades, approvals, refunds — and we maintain an append-only
+          Merkle transparency log and publish signed checkpoints.
+        </p>
+        <p class="lede" style="margin-top:var(--space-4)">
+          Then you run a witness on your own machine. It fetches our checkpoint, demands a
+          cryptographic consistency proof against the history it already knows, and refuses to
+          co-sign if we ever rewrite, truncate, or fork your log. Our own signature on a bad
+          checkpoint becomes the evidence against us.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#pricing">Start now — free tier
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="./docs.html">Read the quickstart</a>
+        </div>
+        <p class="microcopy">10,000 entries/month free · your own witness included · no card</p>
+      </div>
+
+      <div class="term" role="img" aria-label="Terminal output showing the notary-witness command verifying a consistency proof and co-signing a checkpoint, then detecting a split view and refusing to co-sign.">
+<div class="term-bar"><span class="lights"><i></i><i></i><i></i></span> notary-witness watch — acme-agents-prod</div>
+<div class="term-body"><span class="p">$</span> <span class="k">notary-witness watch --log acme-agents-prod</span>
+<span class="c">[10:42:01]</span> fetched checkpoint  size=<span class="k">2,481,930</span>
+<span class="c">           </span> root  <span class="k">620d18e1…a3286f58</span>
+<span class="c">[10:42:01]</span> consistency proof  2,481,904 → 2,481,930
+<span class="c">           </span> 17 nodes verified locally        <span class="ok">OK</span>
+<span class="c">[10:42:01]</span> note signature  notary.dev/acme+3f9c21ab  <span class="ok">OK</span>
+<span class="c">[10:42:01]</span> <span class="ok">co-signed</span>  witness key ed25519:local/…8b92e
+
+<span class="c">[10:57:14]</span> fetched checkpoint  size=<span class="k">2,482,006</span>
+<span class="c">[10:57:14]</span> consistency proof  <span class="d">FAILED</span>
+<span class="c">           </span> <span class="w">old root not derivable from new tree</span>
+<span class="c">           </span> <span class="w">history at index 2,481,912 differs</span>
+<span class="c">[10:57:14]</span> <span class="d">REFUSING TO CO-SIGN</span> — evidence written to
+<span class="c">           </span> ./evidence/2026-08-11T10-57-14Z.split.json
+<span class="c">           </span> <span class="c">(contains both signed checkpoints)</span>
+<span class="p">$</span> <span class="k">_</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- hash texture ticker -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span><b>root</b> 620d18e15a027a7bafcee079e3ee72b39f6d7ae74054eac950bd3c84a3286f58</span>
+    <span><b>leaf</b> 4d7f257e9da7f32989ead03cef9fbbb06d20da7f09ec669b2ff1ea832b914f06</span>
+    <span><b>node</b> 70fb57b7607dfad7e1fcaf10b7c188fe1a1e23a079b9b13ffb6d96d634d95cde</span>
+    <span><b>root</b> 74f4e8ea860ff36634fd1040f25d48b1d27384a1a2d2a9d877c92a9deb79332f</span>
+    <span><b>leaf</b> cae2182fb2126bb48c7f3e3166540e3d141e337eca60145d41783ed8c84c3ef6</span>
+    <span><b>node</b> c554a6eec2bf4fa51c1ad9ecdbbc34b78feb9aa18da9a890e96e25a39248b92e</span>
+    <span><b>root</b> 620d18e15a027a7bafcee079e3ee72b39f6d7ae74054eac950bd3c84a3286f58</span>
+    <span><b>leaf</b> 4d7f257e9da7f32989ead03cef9fbbb06d20da7f09ec669b2ff1ea832b914f06</span>
+    <span><b>node</b> 70fb57b7607dfad7e1fcaf10b7c188fe1a1e23a079b9b13ffb6d96d634d95cde</span>
+    <span><b>root</b> 74f4e8ea860ff36634fd1040f25d48b1d27384a1a2d2a9d877c92a9deb79332f</span>
+    <span><b>leaf</b> cae2182fb2126bb48c7f3e3166540e3d141e337eca60145d41783ed8c84c3ef6</span>
+    <span><b>node</b> c554a6eec2bf4fa51c1ad9ecdbbc34b78feb9aa18da9a890e96e25a39248b92e</span>
+  </div>
+</div>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 class="sec">Four hops from an agent action to a proof you can check offline.</h2>
+    <p class="lede" style="margin-top:var(--space-5)">
+      Nothing in this path requires you to believe us. The last hop is a program you run, holding a
+      key we never see.
+    </p>
+
+    <div class="flow">
+      <div class="node">
+        <span class="n">01 — agent</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        <h3>Agent appends a record</h3>
+        <p>A tool call, a trade, a human approval, a refund. One HTTP call, or one line of the client library.</p>
+        <div class="payload">POST /v1/logs/acme/entries<br>{"action":"refund","amount_cents":4200,…}</div>
+      </div>
+      <div class="node">
+        <span class="n">02 — log</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        <h3>Merkle transparency log</h3>
+        <p>The record is hashed into an append-only RFC 6962 tree. Every entry's position is fixed by every entry after it.</p>
+        <div class="payload">leaf 4d7f257e…2b914f06<br>index 2,481,929</div>
+      </div>
+      <div class="node">
+        <span class="n">03 — checkpoint</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        <h3>Signed checkpoint</h3>
+        <p>We publish a C2SP signed note: origin, tree size, root hash, our Ed25519 signature. Public, timestamped, immutable once seen.</p>
+        <div class="payload">notary.dev/acme<br>2481930<br>Yg0Y4VoCent6/O4Hn+5ys59tevQ…</div>
+      </div>
+      <div class="node terminal-node">
+        <span class="n">04 — your witness</span>
+        <h3>Your witness checks us</h3>
+        <p>Runs on your infrastructure. Verifies our signature, demands a consistency proof from the last checkpoint it accepted, then co-signs — or refuses and keeps the evidence.</p>
+        <div class="payload">ed25519:local/…8b92e<br><span class="ok">co-signed · 2,481,930</span></div>
+      </div>
+    </div>
+
+    <p class="flow-note">
+      <strong>Inclusion proofs work the same way.</strong> When you append, you get a receipt: the leaf hash,
+      the index, and the audit path. Anyone holding a checkpoint can recompute the root from your record
+      and that path — with no network access and no call to us. If the recomputed root matches a checkpoint
+      we signed, the record was in the log at that size. If it doesn't, something is wrong and the math says so.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ DIFFERENTIATOR ============ -->
+<section id="witness">
+  <div class="wrap">
+    <p class="eyebrow">The difference</p>
+    <h2 class="sec">Everyone else asks for trust. We hand you the instrument that checks us.</h2>
+
+    <div class="contrast">
+      <div class="panel them">
+        <span class="label">Every other audit-log vendor</span>
+        <p class="claim">"Your data is safe in our storage. Here is our compliance certificate."</p>
+        <p>
+          The evidence that your log is intact is a claim made by the same party that controls the
+          database. If that party — or someone inside it, or someone who compromises it — edits a row,
+          the only detector is that party's own monitoring. You are asked to audit a vendor using
+          artifacts the vendor produces.
+        </p>
+      </div>
+      <div class="panel us">
+        <span class="label">The Notary</span>
+        <p class="claim">"Don't trust us. Run this, and hold the key yourself."</p>
+        <p>
+          <code class="mono">notary-witness</code> is a small, auditable program — a few hundred lines,
+          source published, reproducible build. It stores the last checkpoint it accepted, demands a
+          consistency proof for every new one, and signs only what verifies. It never sends us your
+          witness key, and it will run against a log we can't see it running against.
+        </p>
+        <ul class="checklist">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Rewrite an old entry → consistency proof fails → witness refuses to co-sign.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Truncate the log → tree size goes backwards → refusal, with both signed checkpoints saved.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Show you one history and an auditor another → two signed checkpoints at one size that don't agree. That's a split view, and it's self-incriminating.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cards3">
+      <div class="card">
+        <span class="kicker">Threat model</span>
+        <h3>A malicious operator with full database access</h3>
+        <p>
+          Assume the worst insider: root on our servers, unrestricted writes, ability to delete backups.
+          They can still corrupt or destroy data — no system prevents that. What they cannot do is change
+          history <em>quietly</em>. Any altered past produces a tree that fails to prove consistency with a
+          checkpoint your witness already holds.
+        </p>
+      </div>
+      <div class="card">
+        <span class="kicker">What they'd actually need</span>
+        <h3>Your witness key, on your machine</h3>
+        <p>
+          To make a rewrite look legitimate, an attacker would need the private key that co-signs
+          checkpoints — which is generated by <code class="mono">notary-witness init</code>, stored on your
+          hardware or your KMS, and never transmitted to us. Compromising our infrastructure is not
+          sufficient. That's the point of the design.
+        </p>
+      </div>
+      <div class="card">
+        <span class="kicker">Evidence, not assurances</span>
+        <h3>Our signature is the liability</h3>
+        <p>
+          Every checkpoint carries our Ed25519 signature over a specific tree size and root hash. If we ever
+          sign two conflicting views of your log, you hold both signed statements. Non-repudiable, verifiable
+          by any third party, admissible as a technical artifact in a dispute.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ AUDIENCE ============ -->
+<section id="who">
+  <div class="wrap">
+    <p class="eyebrow">Who this is for</p>
+    <h2 class="sec">Built for obligations that bind today — not ones that arrive in 2027.</h2>
+    <p class="lede" style="margin-top:var(--space-5)">
+      Records retention rules already require that certain electronic records be preserved in a
+      non-rewriteable, non-erasable form, or that alterations be detectable. Agents now generate those
+      records at machine speed.
+    </p>
+
+    <div class="aud">
+      <div>
+        <span class="reg">SEC Rule 17a-4 · FINRA Rule 4511</span>
+        <h3>Broker-dealers and fintechs</h3>
+        <p>
+          Agents that place orders, move money, adjust limits, or approve exceptions produce books-and-records
+          events. The Notary gives you per-record receipts and an audit-trail alteration detection story that
+          doesn't rest on your vendor's word — plus write-once checkpoint archival on the Regulated plan.
+        </p>
+      </div>
+      <div>
+        <span class="reg">HIPAA § 164.312(b)</span>
+        <h3>Healthcare and health-tech vendors</h3>
+        <p>
+          Audit controls require mechanisms that record and examine activity in systems containing ePHI.
+          Use hash-only privacy mode: you send us record hashes, never the content. You still get inclusion
+          proofs, checkpoints, and independent verification — we hold nothing to breach.
+        </p>
+      </div>
+      <div>
+        <span class="reg">General practice</span>
+        <h3>AI agent operators</h3>
+        <p>
+          Anyone running autonomous or semi-autonomous agents against production systems: tool-call logs,
+          approval chains, prompt and policy versions, model and config changes. When an agent does something
+          expensive, "what exactly happened, and can you prove it" arrives within the hour.
+        </p>
+      </div>
+    </div>
+
+    <p class="flow-note" style="margin-top:var(--space-6)">
+      The EU AI Act's Article 12 record-keeping duty is real, but its high-risk obligations were pushed to
+      December 2027. We don't lead with it. The rules above apply now.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="wrap">
+    <p class="eyebrow">Pricing</p>
+    <h2 class="sec">Your own witness is included on every plan, including free.</h2>
+    <p class="lede" style="margin-top:var(--space-5)">
+      Verification is not an upsell. If independent checking were a paid feature, the free tier would be
+      asking you to trust us — and that's exactly the thing we're arguing against.
+    </p>
+
+    <div class="pricing">
+      <div class="plan">
+        <span class="pname">Free</span>
+        <p class="price">$0<small> / month</small></p>
+        <p class="pdesc">For evaluating the model, side projects, and single-agent deployments.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>10,000 entries per month</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>1 log</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Your own witness included</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Signed checkpoints and inclusion proofs</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="./docs.html#quickstart">Start now</a>
+      </div>
+
+      <div class="plan featured">
+        <span class="pname">Team <span class="tag" style="text-transform:none;letter-spacing:0">most common</span></span>
+        <p class="price">$99<small> / month</small></p>
+        <p class="pdesc">For production agent fleets that need privacy separation and offline checking.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>1,000,000 entries per month</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>3 logs</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Hash-only privacy mode — we never see your data, you still get proofs</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Offline verification CLI</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Everything in Free</span></li>
+        </ul>
+        <a class="btn btn-primary" href="./docs.html#quickstart">Start now</a>
+      </div>
+
+      <div class="plan">
+        <span class="pname">Regulated</span>
+        <p class="price">$799<small> / month</small></p>
+        <p class="pdesc">For firms whose examiners, auditors, or counsel will ask to see the evidence.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Write-once checkpoint archival</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Bitcoin timestamp anchoring via OpenTimestamps</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Retention configuration</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Auditor-facing evidence letter</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Priority support</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Everything in Team</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="mailto:regulated@notary.dev?subject=Regulated%20plan">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIMITATIONS ============ -->
+<section id="limits">
+  <div class="wrap">
+    <div class="limits">
+      <p class="eyebrow">Honest limits</p>
+      <h2>What this cannot do</h2>
+      <div class="grid2">
+        <div>
+          <p>
+            <strong>A transparency log proves that everything in the log is intact. It cannot prove that
+            everything that happened was written to it.</strong> That gap is called omission at the boundary,
+            and it is the honest limit of this entire class of system — ours included.
+          </p>
+          <p>
+            If an agent takes an action and never calls the append endpoint — because it crashed, because a
+            network path failed, or because someone deliberately disabled the call — no cryptography downstream
+            can reveal a record that was never created. The Merkle tree is a statement about its own contents.
+          </p>
+          <p>
+            We say this plainly because auditors already know it. A vendor who implies otherwise is either
+            confused or selling. Being precise about the boundary is what makes the guarantees inside it
+            worth relying on.
+          </p>
+        </div>
+        <div>
+          <ul>
+            <li><strong>We can't stop tampering.</strong> We make it detectable by third parties. Prevention and detection are different properties, and only one of them is achievable by a log.</li>
+            <li><strong>We can't validate truth.</strong> If an agent writes an inaccurate record, the log preserves an inaccurate record faithfully and provably.</li>
+            <li><strong>We can't recover data we never had.</strong> In hash-only privacy mode we hold hashes; if you lose the underlying records, proofs remain valid but the content is gone.</li>
+            <li><strong>A witness that never runs proves nothing.</strong> The guarantee comes from you actually running <code class="mono">notary-witness watch</code> and alerting on refusals.</li>
+            <li><strong>Cryptography is not compliance.</strong> Verifiable records support your 17a-4, 4511, or 164.312(b) program. They don't constitute one, and we won't tell your examiner they do.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">Questions</p>
+    <h2 class="sec">Details a reviewer will ask about.</h2>
+
+    <div class="faq">
+      <details open>
+        <summary><span class="q">01</span> What exactly is a witness, and why does running my own matter?</summary>
+        <p>A witness is a small program that keeps one piece of state — the last checkpoint it accepted — and one secret: a signing key you generate. Each time we publish a new checkpoint, it verifies our signature, requests an RFC 6962 consistency proof between the old tree size and the new one, and recomputes the hashes itself. Only if that proof verifies does it co-sign. Because the key lives with you, a co-signature is a statement you made, not one we can manufacture. And because a refusal is recorded with both signed checkpoints, our own signature becomes the evidence against us.</p>
+      </details>
+      <details>
+        <summary><span class="q">02</span> Can I verify a record without contacting your API?</summary>
+        <p>Yes — that's the design goal. An inclusion proof is a leaf hash, an index, a tree size, and an audit path of sibling hashes. Given a checkpoint you already hold, verification is pure local computation: hash the record, walk the path, compare roots. The offline verification CLI on the Team plan does this with the network disabled. Auditors can run it on an air-gapped machine.</p>
+      </details>
+      <details>
+        <summary><span class="q">03</span> How is hash-only privacy mode different?</summary>
+        <p>Your client canonicalizes and hashes the record locally and sends only the digest and non-sensitive metadata. We append the digest. You keep the plaintext in your own systems. Inclusion proofs, checkpoints, consistency proofs, and witness co-signing all work identically, because the log has never needed to read your data — only to hash it.</p>
+      </details>
+      <details>
+        <summary><span class="q">04</span> What happens if the consistency check fails?</summary>
+        <p>The witness refuses to co-sign, exits non-zero, and writes an evidence bundle containing both conflicting signed checkpoints, the proof it requested, and the response it received. Wire that exit code into your alerting. Nothing about the failure depends on us cooperating — the artifacts are already on your disk.</p>
+      </details>
+      <details>
+        <summary><span class="q">05</span> What does Bitcoin anchoring add on the Regulated plan?</summary>
+        <p>OpenTimestamps commits a checkpoint's root hash into a Bitcoin transaction, producing a timestamp attestation nobody — including us — can backdate. It answers a different question than the witness does: not "is the history consistent" but "did this root hash exist by this date," provable to a third party who has never heard of us. Combined with write-once checkpoint archival, it's the package auditors tend to ask for.</p>
+      </details>
+      <details>
+        <summary><span class="q">06</span> Why "tamper-evident" and not stronger language?</summary>
+        <p>Because stronger language would be false. Nothing in software prevents a sufficiently privileged party from altering bytes. What a Merkle transparency log with independent witnesses gives you is that alterations to recorded history become detectable by parties who don't trust the operator, using math they can run themselves. That's a precise claim, and precision is why regulated buyers take it seriously.</p>
+      </details>
+      <details>
+        <summary><span class="q">07</span> What's the write path overhead?</summary>
+        <p>The client library batches and returns as soon as the entry is durably queued, with a promise of a receipt at the next tree-head integration; you can also request synchronous receipts. Checkpoints are published on a fixed cadence, so witness verification cost is constant regardless of write volume.</p>
+      </details>
+      <details>
+        <summary><span class="q">08</span> Is the witness source available for review?</summary>
+        <p>Yes. It's deliberately small so that a security reviewer can read all of it in an afternoon, with a reproducible build so the binary you run matches the source you read. A verifier you can't audit would recreate the trust problem one layer down.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINALE ============ -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="finale">
+      <h2>Append your first record, then try to catch us cheating.</h2>
+      <p>
+        Free tier, no card, witness included. The quickstart takes about five minutes: install the client,
+        append an entry, verify the receipt with the network off, and start a witness that will keep watching
+        us long after you've stopped thinking about it.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="./docs.html#quickstart">Start now</a>
+        <a class="btn btn-ghost" href="mailto:regulated@notary.dev?subject=Regulated%20plan">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap foot">
+    <div class="col">
+      <a class="brand" href="./index.html" aria-label="The Notary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+          <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+        </svg>
+        <span>The Notary</span>
+      </a>
+      <span class="hash">checkpoint notary.dev/acme · 2481930 · 620d18e1…a3286f58</span>
+    </div>
+    <div class="col">
+      <a href="#how">How it works</a>
+      <a href="#witness">Witness model</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="col">
+      <a href="./docs.html">Documentation</a>
+      <a href="./docs.html#witness">Witness CLI</a>
+      <a href="#limits">What this cannot do</a>
+    </div>
+    <div class="col" style="max-width:38ch">
+      <p class="legal">
+        The Notary provides tamper-evident, independently verifiable logging. It detects and evidences
+        alteration of recorded history; it does not prevent alteration, guarantee completeness of what
+        was submitted, or by itself satisfy any regulatory obligation. Nothing here is legal advice.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
