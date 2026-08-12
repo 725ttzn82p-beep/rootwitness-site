@@ -324,6 +324,17 @@ details p + p { padding-top: 0; margin-top: calc(var(--space-4) * -1 + var(--spa
 .finale p { color: var(--text-2); margin: var(--space-5) auto 0; max-width: 56ch; font-size: var(--text-sm); }
 .finale .cta-row { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-8); flex-wrap: wrap; }
 
+/* Inline prose links. base.css strips decoration globally for nav/button use, so links that
+   sit inside a sentence need it back or they are invisible to a reader. */
+.aud p a, .microcopy a, .lede a, .prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: opacity .15s;
+}
+.aud p a:hover, .microcopy a:hover, .lede a:hover, .prose a:hover { opacity: .72; }
+
 /* ---------- footer ---------- */
 footer.site { border-top: var(--border-w) solid var(--line-soft); padding-block: var(--space-10); background: var(--bg-deep); }
 .foot { display: flex; flex-wrap: wrap; gap: var(--space-6); justify-content: space-between; align-items: flex-start; }
