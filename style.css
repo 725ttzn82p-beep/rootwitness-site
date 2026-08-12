@@ -190,8 +190,12 @@ h1.hero-h em { font-style: normal; color: var(--accent); }
 .term-body {
   font-family: var(--font-mono); font-size: clamp(0.7rem, 0.62rem + 0.35vw, 0.8125rem);
   line-height: 1.75; padding: var(--space-4) var(--space-5);
-  overflow-x: auto; white-space: pre; color: var(--text-2); tab-size: 2;
+  color: var(--text-2); tab-size: 2;
+  /* A real terminal soft-wraps a long line rather than hiding it. These are
+     verbatim tool outputs, so wrap them instead of clipping the tail off. */
+  white-space: pre-wrap; overflow-wrap: anywhere;
 }
+.term-body .cont { color: var(--text-3); }
 .term-body .c { color: var(--text-3); }
 .term-body .p { color: var(--accent); }
 .term-body .k { color: var(--text); }
@@ -372,3 +376,56 @@ table.api { min-width: 520px; }
 .callout.warn { border-left-color: var(--warn); }
 .callout p { margin-top: 0; font-size: var(--text-sm); }
 .callout .ct { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); margin-bottom: var(--space-2); }
+
+/* -- signup ------------------------------------------------------------- */
+.signup-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-10);
+  align-items: start;
+}
+.fld { display: block; margin-bottom: var(--space-5); }
+.fld > span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--space-2);
+}
+.fld input {
+  width: 100%;
+  background: var(--bg-deep);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius);
+  padding: .7rem .8rem;
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+.fld input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.fld input[aria-invalid="true"] { border-color: var(--danger); }
+.fld small { display: block; margin-top: var(--space-2); color: var(--text-3); font-size: var(--text-xs); }
+#signup-form .btn { width: 100%; justify-content: center; }
+#signup-form .btn[disabled] { opacity: .55; cursor: not-allowed; }
+.su-msg { margin-top: var(--space-4); font-size: var(--text-sm); color: var(--text-2); min-height: 1.2em; }
+.su-msg[data-state="error"] { color: var(--danger); }
+.su-msg[data-state="ok"] { color: var(--accent); }
+.su-fine { margin-top: var(--space-4); color: var(--text-3); font-size: var(--text-xs); line-height: 1.55; }
+.su-pre {
+  margin-top: var(--space-3);
+  background: var(--bg-deep);
+  border: var(--border-w) solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-2);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.7;
+}
+@media (max-width: 860px) {
+  .signup-grid { grid-template-columns: 1fr; }
+}
