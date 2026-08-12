@@ -249,7 +249,8 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
         <p>
           Agents that place orders, move money, adjust limits, or approve exceptions produce books-and-records
           events. Root Witness gives you per-record receipts and an audit-trail alteration detection story that
-          doesn't rest on your vendor's word — plus write-once checkpoint archival on the Regulated plan.
+          doesn't rest on your vendor's word. Write-once checkpoint archival is configured per account on the
+          Regulated plan — talk to us before you count on it for a specific retention rule.
         </p>
       </div>
       <div>
@@ -377,19 +378,25 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
         <p class="price">$799<small> / month</small></p>
         <p class="pdesc">For firms whose examiners, auditors, or counsel will ask to see the evidence.</p>
         <ul>
-          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Write-once checkpoint archival</span></li>
-          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Bitcoin timestamp anchoring via OpenTimestamps</span></li>
-          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Retention configuration</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Write-once checkpoint archival, provisioned with you</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Bitcoin timestamp anchoring via OpenTimestamps, enabled per account</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Retention configured to your rule, in writing</span></li>
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Auditor-facing evidence letter</span></li>
-          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Priority support</span></li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>100,000,000 entries per month, 50 logs</span></li>
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Everything in Team</span></li>
         </ul>
-        <a class="btn btn-ghost" href="#signup">Start free, then upgrade</a>
+        <p class="microcopy" style="margin:0 0 var(--space-4)">
+          Not a self-serve plan. Archival, anchoring and retention are set up against your specific rule and
+          confirmed in writing before you pay for them — so this tier starts with a conversation, not a card.
+        </p>
+        <a class="btn btn-ghost" href="#signup">Start on Free, then talk to us</a>
       </div>
     </div>
     <p class="microcopy" style="margin-top:var(--space-6);text-align:center">
       Every plan runs the same log and the same witness. Paid tiers add capacity, privacy separation, and
       the archival and anchoring artifacts an examiner asks for — never the ability to check us.
+      Those two artifacts are provisioned per account rather than switched on by a payment; ask us for the
+      current state of yours and we will tell you plainly.
     </p>
   </div>
 </section>
@@ -425,6 +432,7 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
             <li><strong>We can't recover data we never had.</strong> In hash-only privacy mode we hold hashes; if you lose the underlying records, proofs remain valid but the content is gone.</li>
             <li><strong>A witness that never runs proves nothing.</strong> Detection depends on you actually running <code class="mono">rootwitness watch</code> and alerting on refusals.</li>
             <li><strong>Cryptography is not compliance.</strong> Verifiable records support your 17a-4, 4511, or 164.312(b) program. They don't constitute one, and we won't tell your examiner they do.</li>
+            <li><strong>Archival and anchoring are not on by default.</strong> Both are provisioned per account on the Regulated plan, against your retention rule. Paying does not silently switch them on, and we will not let you tell an examiner they are running until they are.</li>
           </ul>
         </div>
       </div>
@@ -458,6 +466,7 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
       <details>
         <summary><span class="q">05</span> What does Bitcoin anchoring add on the Regulated plan?</summary>
         <p>OpenTimestamps commits a checkpoint's root hash into a Bitcoin transaction, producing a timestamp attestation nobody — including us — can backdate. It answers a different question than the witness does: not "is the history consistent" but "did this root hash exist by this date," provable to a third party who has never heard of us. Combined with write-once checkpoint archival, it's the package auditors tend to ask for.</p>
+        <p>Two caveats we would rather you heard from us. A freshly submitted attestation is a calendar server's promise, not yet Bitcoin evidence — it becomes evidence once a block confirms, and our tooling reports which of the two you are holding. And anchoring is enabled per account rather than by paying, because the cadence and the retention rule are yours to choose. Ask and we will tell you exactly what is running on your account.</p>
       </details>
       <details>
         <summary><span class="q">06</span> Why "tamper-evident" and not stronger language?</summary>
