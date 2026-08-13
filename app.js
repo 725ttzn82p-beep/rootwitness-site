@@ -151,6 +151,8 @@
           '  --origin ' + data.origin + ' \\\n' +
           '  --log-key ' + data.public_key + '\n\n' +
           'rootwitness check';
+        var upField = document.getElementById('up-log');
+        if (upField) upField.value = name;
         out.hidden = false;
         say('Log created. Save your API key now \u2014 it is not shown again.', 'ok');
         button.textContent = 'Log created';
@@ -191,4 +193,101 @@
       el.title = 'Fetched live. No credential required.';
     })
     .catch(function () { /* keep the pre-rendered value */ });
+})();
+
+
+/* -- upgrade to Team -------------------------------------------------------
+ * Stripe asks the buyer to type which log they are paying for, and a Payment
+ * Link cannot have a custom field prefilled -- only client_reference_id and
+ * the utm_* parameters are accepted in the URL. A typo in that field is
+ * expensive: notary/billing.py cannot resolve the origin, logs an error and
+ * returns handled:false, so the card is charged and the tier never moves.
+ *
+ * So the name is checked here against the public checkpoint endpoint, which
+ * needs no credential and answers 404 for a log that does not exist, and is
+ * then also passed as client_reference_id -- the webhook's last-resort source
+ * for the origin, so a name mistyped on Stripe's own page is still
+ * recoverable by hand.
+ *
+ * A failure to CHECK never blocks the payment. Refusing someone's money
+ * because our own endpoint had a bad moment is worse than a name we could not
+ * verify, so that path offers to continue anyway.
+ */
+(function () {
+  var API = 'https://api.rootwitness.com';
+  var TEAM_LINK = 'https://buy.stripe.com/14A5kC1S2bwcgmicAV7Vm00';
+  var NAME_RE = /^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/;
+
+  var form = document.getElementById('upgrade-form');
+  if (!form || !window.fetch) return;
+  var input = document.getElementById('up-log');
+  var msg = document.getElementById('up-msg');
+  var button = document.getElementById('up-go');
+
+  function say(text, state) {
+    msg.textContent = text;
+    if (state) { msg.setAttribute('data-state', state); }
+    else { msg.removeAttribute('data-state'); }
+  }
+
+  function checkoutUrl(name) {
+    return TEAM_LINK + '?client_reference_id=' + encodeURIComponent(name);
+  }
+
+  /* Accept what people actually paste: a bare name, a full log URL, a
+   * host and path. Anything else fails the pattern test below. */
+  function clean(raw) {
+    var value = raw.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    if (value.indexOf('/') !== -1) { value = value.slice(value.lastIndexOf('/') + 1); }
+    return value;
+  }
+
+  function offerAnyway(name) {
+    if (document.getElementById('up-anyway')) return;
+    var link = document.createElement('a');
+    link.id = 'up-anyway';
+    link.className = 'up-anyway';
+    link.href = checkoutUrl(name);
+    link.textContent = 'Continue to checkout anyway';
+    msg.parentNode.insertBefore(link, msg.nextSibling);
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var existing = document.getElementById('up-anyway');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    var name = clean(input.value);
+    input.value = name;
+    if (!NAME_RE.test(name)) {
+      say('That does not look like a log name. Lowercase letters, numbers and dashes.', 'error');
+      input.focus();
+      return;
+    }
+
+    button.disabled = true;
+    say('Checking that log exists\u2026');
+
+    fetch(API + '/' + encodeURIComponent(name) + '/checkpoint', { cache: 'no-store' })
+      .then(function (response) {
+        button.disabled = false;
+        if (response.ok) {
+          say('Found it. Sending you to checkout\u2026', 'ok');
+          window.location.href = checkoutUrl(name);
+          return;
+        }
+        if (response.status === 404) {
+          say('There is no log called \u201c' + name + '\u201d. Check the spelling \u2014 paying for a '
+              + 'log that does not exist will not create it.', 'error');
+          return;
+        }
+        say('Could not check that name just now (HTTP ' + response.status + ').', 'error');
+        offerAnyway(name);
+      })
+      .catch(function () {
+        button.disabled = false;
+        say('Could not reach the service to check that name.', 'error');
+        offerAnyway(name);
+      });
+  });
 })();

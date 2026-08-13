@@ -370,7 +370,7 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Priority support and a named contact</span></li>
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Everything in Free</span></li>
         </ul>
-        <a class="btn btn-primary" href="#signup">Start now</a>
+        <a class="btn btn-primary" href="#upgrade">Upgrade to Team</a>
       </div>
 
       <div class="plan">
@@ -390,8 +390,37 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
           confirmed in writing before you pay for them — so this tier starts with a conversation, not a card.
         </p>
         <a class="btn btn-ghost" href="mailto:hello@rootwitness.com?subject=Regulated%20plan%20enquiry&amp;body=Which%20retention%20rule%20are%20you%20working%20to%3F%20Roughly%20how%20many%20records%20per%20month%3F%0A%0A">Talk to us about Regulated</a>
+        <p class="su-fine" style="margin-top:var(--space-4)">
+          Already spoken with us and ready to start?
+          <a href="https://buy.stripe.com/14A5kC0NY0Ry5HE30l7Vm01">Subscribe to Regulated</a>.
+          Checkout asks which log you are paying for.
+        </p>
       </div>
     </div>
+
+    <div class="panel upgrade" id="upgrade">
+      <p class="label">Upgrade an existing log to Team</p>
+      <p class="su-fine" style="margin-top:var(--space-3)">
+        Checkout asks which log you are paying for, and it has to be typed by hand. We check the name
+        against the live log first, because a name that matches nothing takes the payment without
+        lifting the quota.
+      </p>
+      <form id="upgrade-form" novalidate>
+        <label class="fld">
+          <span>Your log name</span>
+          <input type="text" id="up-log" name="log_name" required
+                 pattern="[a-z0-9][a-z0-9-]{1,30}[a-z0-9]"
+                 placeholder="acme-agents" autocapitalize="off" spellcheck="false">
+        </label>
+        <button class="btn btn-primary" type="submit" id="up-go">Check the name and continue &mdash; $99 / month</button>
+        <p class="su-msg" id="up-msg" role="status" aria-live="polite"></p>
+      </form>
+      <p class="su-fine">
+        No log yet? <a href="#signup">Create a free one first</a>. Your origin and API key do not change
+        when you upgrade, and your entries and proofs are untouched.
+      </p>
+    </div>
+
     <p class="microcopy" style="margin-top:var(--space-6);text-align:center">
       Every plan runs the same log and the same witness. Paid tiers add capacity, privacy separation, and
       the archival and anchoring artifacts an examiner asks for — never the ability to check us.
