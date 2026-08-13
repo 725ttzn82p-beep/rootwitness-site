@@ -215,14 +215,61 @@
  */
 (function () {
   var API = 'https://api.rootwitness.com';
-  var TEAM_LINK = 'https://buy.stripe.com/14A5kC1S2bwcgmicAV7Vm00';
   var NAME_RE = /^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/;
+
+  /* Both tiers go through the same check. Regulated is the more expensive
+   * mistake by a factor of eight, so it is the last one that should have
+   * been left pointing straight at Stripe. */
+  var TIERS = {
+    team: {
+      link: 'https://buy.stripe.com/14A5kC1S2bwcgmicAV7Vm00',
+      label: 'Check the name and continue \u2014 $99 / month'
+    },
+    regulated: {
+      link: 'https://buy.stripe.com/14A5kC0NY0Ry5HE30l7Vm01',
+      label: 'Check the name and continue \u2014 $799 / month'
+    }
+  };
 
   var form = document.getElementById('upgrade-form');
   if (!form || !window.fetch) return;
   var input = document.getElementById('up-log');
   var msg = document.getElementById('up-msg');
   var button = document.getElementById('up-go');
+  var regnote = document.getElementById('up-regnote');
+  var radios = form.querySelectorAll('input[name="tier"]');
+
+  function currentTier() {
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i].checked && TIERS[radios[i].value]) return radios[i].value;
+    }
+    return 'team';
+  }
+
+  function syncTier() {
+    var tier = currentTier();
+    button.textContent = TIERS[tier].label;
+    if (regnote) { regnote.hidden = (tier !== 'regulated'); }
+    var stale = document.getElementById('up-anyway');
+    if (stale) stale.parentNode.removeChild(stale);
+    say('');
+  }
+
+  for (var r = 0; r < radios.length; r++) {
+    radios[r].addEventListener('change', syncTier);
+  }
+
+  /* The Regulated card's link now lands here instead of on Stripe. */
+  var regJump = document.getElementById('reg-jump');
+  if (regJump) {
+    regJump.addEventListener('click', function () {
+      for (var i = 0; i < radios.length; i++) {
+        radios[i].checked = (radios[i].value === 'regulated');
+      }
+      syncTier();
+      window.setTimeout(function () { input.focus(); }, 200);
+    });
+  }
 
   function say(text, state) {
     msg.textContent = text;
@@ -231,7 +278,7 @@
   }
 
   function checkoutUrl(name) {
-    return TEAM_LINK + '?client_reference_id=' + encodeURIComponent(name);
+    return TIERS[currentTier()].link + '?client_reference_id=' + encodeURIComponent(name);
   }
 
   /* Accept what people actually paste: a bare name, a full log URL, a

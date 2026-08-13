@@ -392,20 +392,30 @@ Evidence: <span class="k">~/.rootwitness/REFUSED-20260812T153621Z-df5f01f20c0c.e
         <a class="btn btn-ghost" href="mailto:hello@rootwitness.com?subject=Regulated%20plan%20enquiry&amp;body=Which%20retention%20rule%20are%20you%20working%20to%3F%20Roughly%20how%20many%20records%20per%20month%3F%0A%0A">Talk to us about Regulated</a>
         <p class="su-fine" style="margin-top:var(--space-4)">
           Already spoken with us and ready to start?
-          <a href="https://buy.stripe.com/14A5kC0NY0Ry5HE30l7Vm01">Subscribe to Regulated</a>.
-          Checkout asks which log you are paying for.
+          <a href="#upgrade" id="reg-jump">Subscribe to Regulated</a>.
+          Checkout asks which log you are paying for, so we check the name first.
         </p>
       </div>
     </div>
 
     <div class="panel upgrade" id="upgrade">
-      <p class="label">Upgrade an existing log to Team</p>
+      <p class="label">Upgrade an existing log</p>
       <p class="su-fine" style="margin-top:var(--space-3)">
         Checkout asks which log you are paying for, and it has to be typed by hand. We check the name
         against the live log first, because a name that matches nothing takes the payment without
         lifting the quota.
       </p>
       <form id="upgrade-form" novalidate>
+        <fieldset class="tierpick" id="up-tier">
+          <legend>Plan</legend>
+          <label><input type="radio" name="tier" value="team" checked><span>Team &mdash; $99 / month</span></label>
+          <label><input type="radio" name="tier" value="regulated"><span>Regulated &mdash; $799 / month</span></label>
+        </fieldset>
+        <p class="su-fine" id="up-regnote" hidden>
+          Regulated is set up against your retention rule before it is useful to you. If you have not
+          spoken to us yet, <a href="mailto:hello@rootwitness.com?subject=Regulated%20plan%20enquiry">start there</a>
+          rather than here — paying first does not switch archival or anchoring on.
+        </p>
         <label class="fld">
           <span>Your log name</span>
           <input type="text" id="up-log" name="log_name" required

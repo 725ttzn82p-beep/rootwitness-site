@@ -110,6 +110,20 @@ a stored earlier checkpoint forces them to produce a consistency proof.</code></
       log's public key. Appending is one HTTP call; the response is a receipt
       giving the sequence number and the RFC 6962 leaf hash.
     </p>
+    <div class="callout">
+      <div class="ct">About the numbers on this page</div>
+      <p>
+        The checkpoints shown here are live captures at tree size 13. The
+        append and proof responses below are a recorded session from earlier,
+        at tree size 11, because those endpoints take a key and run against
+        your own log rather than this one. The demo log is append-only and
+        still running, so by the time you read this it is larger again — the
+        size and root you get back will not match the ones printed here, and
+        that is expected rather than a fault. What should match is the shape
+        of each response, and the fact that the signature on whichever
+        checkpoint you fetch verifies under the published key.
+      </p>
+    </div>
     <div class="codeblock">
       <div class="cb-bar"><span class="cb-name">shell</span><button class="copy" type="button">copy</button></div>
 <pre><code>curl -X POST https://api.rootwitness.com/demo/append \
@@ -153,10 +167,10 @@ a stored earlier checkpoint forces them to produce a consistency proof.</code></
     <div class="codeblock">
       <div class="cb-bar"><span class="cb-name">output</span><button class="copy" type="button">copy</button></div>
 <pre><code>https://api.rootwitness.com/demo
-12
-gUF7FxKEkz8HK434ellhpxZV18pSLinmeiaPEyQsUKM=
+13
+/7ABPyKaEGjlYWwotnkup3nVLVjaqBXruAWcBt//eW8=
 
-— https://api.rootwitness.com/demo fippB5FaTh8yYOyOIwmXNCx+RsiTyfvaCCc2TMzINzC2kgd8dCLZzyXQ9A/2paY+TgeOsvzr9QgMMeAIiN8w4ISFMwM=</code></pre>
+— https://api.rootwitness.com/demo fippB9QKjq8m/mmasnImBMkurJoMvkCPHTf9InScJdDpfquusYmfYe5q1vYLVclIaFF+QmhI/jUm+9nR3XJVZ+g5ygI=</code></pre>
     </div>
     <p>
       The size and root above are whatever the log was serving when this page
@@ -283,10 +297,10 @@ receipt = json.load(urllib.request.urlopen(req))
     <div class="codeblock">
       <div class="cb-bar"><span class="cb-name">GET /demo/checkpoint</span><button class="copy" type="button">copy</button></div>
 <pre><code>https://api.rootwitness.com/demo
-12
-gUF7FxKEkz8HK434ellhpxZV18pSLinmeiaPEyQsUKM=
+13
+/7ABPyKaEGjlYWwotnkup3nVLVjaqBXruAWcBt//eW8=
 
-— https://api.rootwitness.com/demo fippB5FaTh8yYOyOIwmXNCx+RsiTyfvaCCc2TMzINzC2kgd8dCLZzyXQ9A/2paY+TgeOsvzr9QgMMeAIiN8w4ISFMwM=</code></pre>
+— https://api.rootwitness.com/demo fippB9QKjq8m/mmasnImBMkurJoMvkCPHTf9InScJdDpfquusYmfYe5q1vYLVclIaFF+QmhI/jUm+9nR3XJVZ+g5ygI=</code></pre>
     </div>
     <p>
       A witness adds a second signature line of its own. That line is your
