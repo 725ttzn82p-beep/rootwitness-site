@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms of Service — Root Witness</title>
+<meta name="description" content="The terms that govern Root Witness: plans and billing, your content, what the service can and cannot do, export, and liability. Plain language, Pennsylvania law.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334d0a8' stroke-width='1.6'%3E%3Cpath d='M12 2.6l7 3.4v5.4c0 4.3-2.9 8-7 10.1-4.1-2.1-7-5.8-7-10.1V6z'/%3E%3Cpath d='M12 9.2v5.6M9.2 12h5.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="./index.html" aria-label="Root Witness — home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+        <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+      </svg>
+      <span>Root&nbsp;Witness</span>
+      <span class="sub">legal</span>
+    </a>
+    <nav class="nav-links">
+      <a href="./index.html#how" class="hide-sm">How it works</a>
+      <a href="./index.html#witness" class="hide-sm">Witness</a>
+      <a href="./index.html#pricing">Pricing</a>
+      <a href="./docs.html">Docs</a>
+      <button class="icon-btn" id="theme" aria-label="Toggle color theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 019.4 3.5a8.6 8.6 0 1011.1 11.1z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="docs-layout">
+
+  <aside class="toc">
+    <p class="toc-h">Contents</p>
+    <a href="#what">1 · What the service is</a>
+    <a href="#accounts">2 · Accounts and log names</a>
+    <a href="#billing">3 · Plans and billing</a>
+    <a href="#content">4 · Your content and privacy</a>
+    <a href="#use">5 · Acceptable use</a>
+    <a href="#does">6 · What the service does</a>
+    <a href="#sla">7 · Service levels</a>
+    <a href="#limits">8 · What this cannot do</a>
+    <a href="#export">9 · Export and portability</a>
+    <a href="#ip">10 · Intellectual property</a>
+    <a href="#termination">11 · Termination</a>
+    <a href="#disclaimers">12 · Disclaimers</a>
+    <a href="#liability">13 · Limitation of liability</a>
+    <a href="#indemnification">14 · Indemnification</a>
+    <a href="#changes">15 · Changes to these terms</a>
+    <a href="#general">16 · General</a>
+    <a href="#contact">17 · Contact</a>
+  </aside>
+
+  <article class="doc">
+    <p class="eyebrow" style="margin-bottom:var(--space-4)">Legal</p>
+    <h1>Terms of Service</h1>
+    <p><code>Effective August 19, 2026</code></p>
+    <p>
+      These terms govern your use of Root Witness, a service operated by
+      <strong>MVM Ventures, LLC</strong>, a Pennsylvania limited liability company
+      ("MVM Ventures," "we," "us"). By creating a log, calling the API, or paying
+      for a plan, you agree to these terms. If you are using the service on behalf
+      of a company, you confirm you have authority to bind that company, and "you"
+      means the company.
+    </p>
+    <p>If you do not agree to these terms, do not use the service.</p>
+
+    <h2 id="what">1 · What the service is</h2>
+    <p>
+      Root Witness is a tamper-evident audit log. You send us records (or hashes
+      of records); we append them to a cryptographic transparency log, sign
+      checkpoints over the log's state, and give you receipts and inclusion
+      proofs that anyone can verify independently — including with our
+      open-source witness tool, without trusting us.
+    </p>
+    <p>
+      The service is designed so that tampering is <strong>detectable</strong>,
+      not impossible. <a href="#limits">Section 8</a> describes what the service
+      cannot do. Read it; it is part of these terms, and our marketing does not
+      promise more than it says.
+    </p>
+
+    <h2 id="accounts">2 · Accounts and log names</h2>
+    <p>You create a log by choosing a log name and receiving an API key. You are responsible for:</p>
+    <ul class="bul">
+      <li>keeping your API key secret. Anyone holding the key can append to your log;</li>
+      <li>the accuracy of what you submit. We record what you send; we do not verify that it is true;</li>
+      <li>choosing a log name that does not infringe anyone else's rights or impersonate anyone.</li>
+    </ul>
+    <p>
+      We may reclaim log names that are inactive on the free tier, infringing,
+      or misleading, with notice where practical.
+    </p>
+
+    <h2 id="billing">3 · Plans and billing</h2>
+    <ul class="bul">
+      <li><strong>Free</strong> — one log with limited capacity, suitable for evaluation and small projects.</li>
+      <li><strong>Team ($99/month)</strong> — higher capacity and hash-only privacy mode.</li>
+      <li><strong>Regulated ($799/month)</strong> — adds write-once archival and external anchoring, provisioned per account after onboarding.</li>
+    </ul>
+    <p>
+      Billing is monthly through Stripe, our payment processor. Paid plans renew
+      automatically until cancelled. You can cancel at any time; cancellation
+      takes effect at the end of the current billing period, and we do not
+      prorate partial months. We may change prices with at least 30 days'
+      notice; price changes apply from your next billing period after the
+      notice period ends.
+    </p>
+    <p>
+      If a payment fails and remains unpaid after we notify you, we may
+      downgrade the log to free-tier limits. Downgrading does not delete the
+      log's existing entries.
+    </p>
+
+    <h2 id="content">4 · Your content and privacy</h2>
+    <p>
+      <strong>What we hold depends on the mode you use.</strong> In standard
+      mode, we store the records you submit. In hash-only privacy mode, you
+      send us only cryptographic hashes, and we never receive the underlying
+      content.
+    </p>
+    <p>
+      You retain all rights to your content. You grant us only the license
+      needed to operate the service: to store your submissions, incorporate
+      their hashes into the log structure, serve them back to you, and serve
+      proofs (which contain hashes, not content) to anyone you share them with.
+    </p>
+    <p>
+      You are responsible for making sure that what you submit to us is lawful
+      for you to share with us, and that submitting it does not violate
+      anyone's privacy or confidentiality rights. If your records contain
+      personal data subject to privacy law, prefer hash-only mode.
+    </p>
+    <p>
+      Our <a href="./privacy.html">privacy policy</a> describes what we collect
+      about you as an account holder.
+    </p>
+
+    <h2 id="use">5 · Acceptable use</h2>
+    <p>Do not:</p>
+    <ul class="bul">
+      <li>submit content that is unlawful for us to store;</li>
+      <li>use the service to create a false or misleading evidentiary record — for example, backdating fabricated records to make them appear contemporaneous;</li>
+      <li>probe, overload, or interfere with the service or other customers' logs;</li>
+      <li>resell the service as your own without a written agreement with us.</li>
+    </ul>
+    <p>
+      We may suspend a log that violates this section. Where the violation is
+      curable, we will tell you what the problem is and give you a reasonable
+      opportunity to fix it before suspension becomes termination.
+    </p>
+
+    <h2 id="does">6 · What the service does</h2>
+    <p>For each accepted submission, the service:</p>
+    <ul class="bul">
+      <li>appends an entry to an append-only transparency log (a Merkle tree, following the design of RFC 6962);</li>
+      <li>returns a signed receipt binding your submission to a position in that log;</li>
+      <li>periodically publishes signed checkpoints committing to the entire log state;</li>
+      <li>makes inclusion and consistency provable with standard cryptographic proofs that third parties can check with our open-source witness or their own tooling.</li>
+    </ul>
+    <p>
+      On the Regulated tier, entries can additionally be archived to write-once
+      storage and anchored to an external timestamping system, so that the
+      log's history is co-witnessed by infrastructure outside our control.
+    </p>
+
+    <h2 id="sla">7 · Service levels</h2>
+    <p>
+      We aim for high availability but do not promise uninterrupted operation.
+      The free and Team tiers carry no service-level commitment. Regulated-tier
+      customers may negotiate a service-level agreement in writing; if we sign
+      one with you, it supplements these terms.
+    </p>
+    <p>
+      Planned maintenance will be announced when it is expected to interrupt
+      service. Your witness continues to be able to verify previously issued
+      proofs even while the service is unavailable.
+    </p>
+
+    <h2 id="limits">8 · What this service cannot do</h2>
+    <div class="callout warn">
+      <div class="ct">Read this section</div>
+      <p>
+        This section states the limits of the service plainly. Nothing
+        elsewhere in these terms, on our website, or in our marketing should be
+        read as promising more.
+      </p>
+    </div>
+    <ul class="bul">
+      <li><strong>We cannot prevent tampering; we make it detectable.</strong> If someone alters or truncates the log, verification fails and witnesses detect the inconsistency. Detection is the product. Prevention of all interference with a running computer system is not something we or anyone can deliver.</li>
+      <li><strong>We cannot verify the truth of your records.</strong> A signed receipt proves that a specific record existed at a specific log position at a specific time. It does not prove the record's contents are accurate or honest.</li>
+      <li><strong>We cannot recover content we never had.</strong> In hash-only mode we hold hashes. If you lose the underlying records, your proofs remain valid but the content is gone.</li>
+      <li><strong>We cannot make you compliant by ourselves.</strong> Root Witness can support record-keeping obligations (for example under SEC Rule 17a-4 or FINRA Rule 4511), but whether your overall system meets a regulation depends on how you use it. We do not represent that subscribing to any tier makes you compliant with any law or rule.</li>
+      <li><strong>We cannot stop a key holder from appending.</strong> If your API key leaks, an attacker can append entries to your log until you rotate the key. Those entries will be detectably present — the log shows exactly what was appended and when — but the service cannot know they were not yours.</li>
+      <li><strong>A small operator stands behind this.</strong> Root Witness is operated by a small company. The design compensates for this: proofs are independently verifiable, the witness is open source, and Regulated-tier anchoring places evidence outside our infrastructure — so the value of receipts you already hold does not depend on trusting us, or on our continued existence.</li>
+    </ul>
+
+    <h2 id="export">9 · Export and portability</h2>
+    <p>
+      You can retrieve your entries, receipts, and checkpoints through the API
+      at any time. If you cancel, the export path stays available on free-tier
+      limits for at least 30 days after cancellation. Proofs you have already
+      downloaded are self-contained and remain verifiable without us.
+    </p>
+
+    <h2 id="ip">10 · Intellectual property</h2>
+    <p>
+      The service, its software, and its documentation are owned by
+      MVM Ventures, LLC or its licensors. The witness tool is open source under
+      the license published in its repository; that license, not these terms,
+      governs your use of it. "Root Witness" and associated marks are
+      trademarks of MVM Ventures, LLC; these terms do not license them.
+    </p>
+    <p>Feedback you send us may be used to improve the service without obligation to you.</p>
+
+    <h2 id="termination">11 · Termination</h2>
+    <p>
+      You may stop using the service and cancel at any time. We may terminate
+      or suspend your access for material breach of these terms that remains
+      uncured 14 days after notice, for non-payment under
+      <a href="#billing">Section 3</a>, or where required by law. We may
+      discontinue the service entirely with at least 90 days' notice, during
+      which export under <a href="#export">Section 9</a> remains available.
+    </p>
+    <p>
+      Sections 4 (your rights in your content), 8, 9 (for its stated period),
+      10, 12, 13, and 14 survive termination.
+    </p>
+
+    <h2 id="disclaimers">12 · Disclaimers</h2>
+    <p>
+      Except as expressly stated in these terms, the service is provided
+      <strong>"as is" and "as available."</strong> To the maximum extent
+      permitted by law, we disclaim all implied warranties, including
+      merchantability, fitness for a particular purpose, and non-infringement.
+      We do not warrant that the service will meet any regulatory requirement
+      applicable to you, or that operation will be uninterrupted or error-free.
+    </p>
+
+    <h2 id="liability">13 · Limitation of liability</h2>
+    <p>To the maximum extent permitted by law:</p>
+    <ul class="bul">
+      <li>neither party is liable for indirect, incidental, consequential, special, or punitive damages, or lost profits, revenue, or data, even if advised of the possibility;</li>
+      <li>our total aggregate liability arising out of or relating to the service is capped at the amounts you paid us in the 12 months before the event giving rise to the claim, or $100 if you paid nothing.</li>
+    </ul>
+    <p>
+      Nothing in these terms limits liability that cannot be limited under
+      applicable law, including liability for willful misconduct or fraud.
+    </p>
+
+    <h2 id="indemnification">14 · Indemnification</h2>
+    <p>
+      You will defend and indemnify MVM Ventures, LLC against third-party
+      claims arising from your content, your use of the service in violation of
+      these terms, or your violation of law — except to the extent the claim
+      results from our breach of these terms.
+    </p>
+
+    <h2 id="changes">15 · Changes to these terms</h2>
+    <p>
+      We may update these terms. For material changes we will give at least 30
+      days' notice by email to the address on your account or by notice in the
+      service. Changes apply prospectively from the effective date in the
+      notice. If you do not agree to a change, cancel before it takes effect;
+      continuing to use the service after the effective date is acceptance.
+    </p>
+
+    <h2 id="general">16 · General</h2>
+    <ul class="bul">
+      <li><strong>Governing law and venue.</strong> These terms are governed by Pennsylvania law, without regard to conflict-of-laws rules. Disputes will be resolved in the state or federal courts sitting in Philadelphia County, Pennsylvania, and both parties consent to that venue.</li>
+      <li><strong>Assignment.</strong> You may not assign these terms without our consent, except to a successor in a merger or sale of substantially all assets, with notice to us. We may assign them to a successor of the business.</li>
+      <li><strong>Entire agreement.</strong> These terms, together with the <a href="./privacy.html">privacy policy</a> and any signed order or SLA, are the entire agreement about the service and supersede prior discussions.</li>
+      <li><strong>Severability; waiver.</strong> If a provision is unenforceable, the rest stands. Not enforcing a provision is not a waiver.</li>
+      <li><strong>Notices.</strong> Legal notices to us: <a href="mailto:hello@rootwitness.com">hello@rootwitness.com</a>. Notices to you: your account email.</li>
+    </ul>
+
+    <h2 id="contact">17 · Contact</h2>
+    <p>
+      MVM Ventures, LLC<br>
+      Philadelphia, Pennsylvania<br>
+      <a href="mailto:hello@rootwitness.com">hello@rootwitness.com</a> — general and legal<br>
+      <a href="mailto:support@rootwitness.com">support@rootwitness.com</a> — support
+    </p>
+  </article>
+
+</div>
+</main>
+
+<footer class="site">
+  <div class="wrap foot">
+    <div class="col">
+      <a class="brand" href="./index.html" aria-label="Root Witness">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M12 2.4l7.2 3.4v5.5c0 4.4-3 8.2-7.2 10.3C7.8 19.5 4.8 15.7 4.8 11.3V5.8z"/>
+          <path d="M8.4 13.4l2.5-3.1 2.2 2.1 2.5-3.4"/>
+        </svg>
+        <span>Root Witness</span>
+      </a>
+      <span class="hash" id="live-checkpoint">checkpoint api.rootwitness.com/demo · 12 · gUF7FxKE…EyQsUKM=</span>
+    </div>
+    <div class="col">
+      <a href="./index.html#how">How it works</a>
+      <a href="./index.html#witness">Witness model</a>
+      <a href="./index.html#pricing">Pricing</a>
+      <a href="./docs.html">Documentation</a>
+    </div>
+    <div class="col">
+      <a href="./terms.html">Terms of service</a>
+      <a href="./privacy.html">Privacy policy</a>
+      <a href="mailto:hello@rootwitness.com">hello@rootwitness.com</a>
+      <a href="mailto:support@rootwitness.com">support@rootwitness.com</a>
+    </div>
+    <div class="col" style="max-width:38ch">
+      <p class="legal">
+        Root Witness is a product of MVM&nbsp;Ventures,&nbsp;LLC, a Pennsylvania limited liability company.
+      </p>
+      <p class="legal">
+        Root Witness provides tamper-evident, independently verifiable logging. It detects and evidences
+        alteration of recorded history; it does not prevent alteration, guarantee completeness of what
+        was submitted, or by itself satisfy any regulatory obligation. Nothing here is legal advice.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
